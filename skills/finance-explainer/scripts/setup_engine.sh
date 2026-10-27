@@ -5,7 +5,7 @@ set -e
 DST="${1:?用法: setup_engine.sh <项目目录>}"
 SKILL="$(cd "$(dirname "$0")/.." && pwd)"
 mkdir -p "$DST"
-rsync -a "$SKILL/templates/engine/" "$DST/"
+if command -v rsync >/dev/null; then rsync -a "$SKILL/templates/engine/" "$DST/"; else (cd "$SKILL/templates/engine" && cp -r . "$DST/"); fi
 if [ ! -d "$DST/node_modules" ]; then
   for SRC in "$HOME/Desktop/xiaolin-remake/engine" "$HOME/Desktop/workbuddy-oneshot" "$HOME/Desktop/style-lab"; do
     if [ -f "$SRC/node_modules/remotion/package.json" ] && grep -q '"version": "4.0.408"' "$SRC/node_modules/remotion/package.json"; then

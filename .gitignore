@@ -8,3 +8,10 @@ __pycache__/
 public/main*.mp4
 public/voice*.wav
 bin/
+# 本地成片工程（不入库：含 node_modules 与成片）
+xinjiao-90s/
+logs/
+*.mp4
+*.wav
+gen/
+voice/

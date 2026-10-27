@@ -9,7 +9,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 ![Agent Skill](https://img.shields.io/badge/Agent%20Skill-SKILL.md-orange)
-[![Renoise MCP](https://img.shields.io/badge/video-Renoise%20MCP-ff7a1a)](https://renoise.ai/mcp?utm_medium=xcom&utm_source=official)
+[![即梦 dreamina CLI](https://img.shields.io/badge/video-%E5%8D%B3%E6%A2%A6%20dreamina%20CLI-ff355f)](https://jimeng.jianying.com)
 ![Remotion](https://img.shields.io/badge/edit-Remotion%204-0b84f3)
 
 <img src="docs/images/cover.jpg" width="820" alt="一张照片 + 一句话，27 秒直播带货广告">
@@ -18,7 +18,7 @@
 
 > 这条 27 秒的直播间广告里，主播不存在。脸、声音、直播间、花字、价格动画，全是 AI 做的。
 > 输入只有一句话：「用这个数字人做一条 30 秒直播间广告，卖 WorkBuddy 上手课，10 节课 99 元，原价 999。」
-> 总共花了 **482 [Renoise](https://renoise.ai/mcp?utm_medium=xcom&utm_source=official) 积分**。
+> 迁移到即梦通道后，同样一条片子只需 **约 170 即梦积分**（每日可领）；我们实测跑通的第一条完整成片——90 秒财经解说——口播部分只花了 330 积分。
 
 ---
 
@@ -49,25 +49,25 @@
 
 ## 能做什么
 
-- **一张照片做出固定的数字人**：脸、服装、声音描述、提示词模板都存在 `persona.json`，每条片子都是同一个人。想进什么场景（直播间、门店、教室、京都街头），先用 GPT Image 合成开场画面，再让她开口。
-- **对口型的口播片段**：稿子切成 ≤ 15 秒一段，通过 **[Renoise MCP](https://renoise.ai/mcp?utm_medium=xcom&utm_source=official)** 用 **Grok Video 1.5** 生成。也写了 Wan 3.0、OmniHuman（用你自己的录音驱动口型）的用法。
-- **先报价，再花钱**：每次生成前，Agent 先报「段数 · 秒数 · 积分 · 余额」，你点头才开始；先拍第 1 段给你看，满意再批量。
-- **两道质检**：每段用 whisper 回听、和稿子比对；每段抽 4 帧检查（Grok 偶尔会自己往画面里烧字幕，有就重拍那段）。
-- **声音统一**：1/3 倍频程频谱匹配 + 去齿音 + 同一个小房间混响 + 响度统一，30 段分开生成的口播听起来像一次录完（实测齿音段间差 13.2 dB → 5.9 dB）。
+- **一张照片做出固定的数字人**：脸、服装、声音描述、提示词模板都存在 `persona.json`，每条片子都是同一个人。想进什么场景（直播间、门店、教室、书房），先用即梦图片合成定妆照/开场画面，再让她开口。
+- **对口型的口播片段**：稿子切段后走**即梦官方 dreamina CLI**——`seedance2.0mini` 两种玩法：把台词写进提示词让模型原生配音（口型天然同步），或用你自录/TTS 的音频作参考做音频驱动口型（口型跟最终声音逐字同步，成片零换声）。长段/精修用 `seedance2.5`（单次最长 30 秒，VIP）。
+- **先报价，再花钱**：所有生成脚本默认干跑——先报「段数 · 秒数 · 积分 · 余额」，你点头加 `--yes` 才提交；先拍第 1 段给你看，满意再批量。
+- **两道质检**：每段用 `apiz align` 把生成语音和文稿逐字比对（实测零错字，同时产出字级打轴数据），再抽帧检查（Seedance 偶尔也会自己烧字幕，有就重拍那段）。本地 whisper 仍可用（零积分可选）。
+- **声音统一**：固定角色参考图（Seedance 会从脸推声音）+ 固定音色描述 + 1/3 倍频程频谱匹配与去齿音（`voicefx/unify.py`，实测齿音段间差 13.2 dB → 5.9 dB），30 段分开生成的口播听起来像一次录完。
 - **按内容推荐剪辑风格**：Agent 先诊断内容，推荐 2 种风格并附预览图，一次问完（风格 · 比例时长 · 花字强度 · 主播）。
 - **48 个包装组件**：逐帧拆了 25 支头部博主视频（MrBeast、Mark Rober、Ryan Trahan、MKBHD、影视飓风、何同学、Johnny Harris、Vox、Kurzgesagt、回形针、半佛仙人、差评、毕导）。每种风格自带默认包装，想加减直接说。
 - **景深字**：大字 / 数字放在背景和人之间（macOS Vision 人像分割 → 透明视频 → 三层合成）。
-- **多语言**：英、日、韩、法、西、阿拉伯语实测，whisper 回听准确率 94–100%。
-- **多种 Agent 都能用**：标准 `SKILL.md` Agent Skill + 脚本，只要能装 Skill、能接远程 MCP、能在本机跑命令，就能驱动整条流程。
+- **多语言**：英、日、韩、法、西、阿拉伯语实测；旁白与指定音色走 edge-tts（免费），克隆声走 apiz。
+- **多种 Agent 都能用**：标准 `SKILL.md` Agent Skill + 脚本。**不再需要接任何 MCP 服务器**——只要能装 Skill、能在本机跑命令（即梦 CLI / ffmpeg / Python / Node），就能驱动整条流程。
 
 ## 工作流程
 
 ```
-你的内容 ──► 0. 环境检查（Renoise MCP / ffmpeg / whisper，已经有的直接跳过）
+你的内容 ──► 0. 环境检查（即梦 dreamina CLI / apiz / ffmpeg，已经有的直接跳过）
               1. 诊断内容 → 5 种风格里推荐 2 种 → 一次问完 → brief.json
               2. 写稿 script.json（每段 ≤15 秒，中文约 5.4 字/秒）
-              3. 报价 → 等你确认 → 先拍第 1 段 → 你看过 → 批量
-              4. 分片下载（防 CDN 截断）→ whisper 回听 → 抽帧检查
+              3. build_plan 报价 → 等你确认 → 先拍第 1 段 → 你看过 → 批量
+              4. 生成（即梦）→ 下载校验 → apiz align 回听 → 抽帧检查
               5. 声音统一（频谱匹配 + 去齿音 + 同一房间混响）
               6. 逐字时间轴（tl.json）
               7. Remotion 剪辑：风格模板 + 默认包装（+ 你点名的手法）
@@ -80,22 +80,23 @@
 
 ## 支持哪些 Agent
 
-这个 Skill 是一个带 `SKILL.md`（开放的 Agent Skills 格式）的文件夹，加上 Python / Shell / Remotion 脚本。要跑通**完整**流程，Agent 需要三样能力：
+这个 Skill 是一个带 `SKILL.md`（开放的 Agent Skills 格式）的文件夹，加上 Python / Shell / Remotion 脚本。要跑通**完整**流程，Agent 只需要两样能力：
 
 1. **能装 Agent Skills**（技能目录或上传技能包）；
-2. **能接远程 MCP 服务器**（Renoise：Streamable HTTP，浏览器登录授权，不用复制 API key）；
-3. **能在你电脑上执行命令**（ffmpeg、Python、Node，用来下载、质检、剪辑）。
+2. **能在你电脑上执行命令**（即梦 dreamina CLI、apiz CLI、ffmpeg、Python、Node——用来生成、质检、剪辑）。
 
-| Agent | 装 Skill | 接 Renoise MCP | 本机执行命令 | 状态 |
-|---|---|---|---|---|
-| **Claude Code** | `~/.claude/skills/` | `/plugin`（见下文） | ✅ | ✅ 已实测，这个仓库就是用它做的 |
-| **Codex**（CLI / 桌面） | `~/.codex/skills/` | `codex mcp add` | ✅ | ✅ 预期可用（同一套脚本） |
-| **OpenClaw** | 放进 OpenClaw 的技能目录（见其文档） | `openclaw plugins install` | ✅ | ⚙️ 应可用 |
-| **WorkBuddy** | 技能 → 导入文件夹 / 压缩包 | 连接器 → 添加自定义 MCP | ✅ 桌面端 Agent | ⚙️ 应可用，菜单名以 App 当前版本为准 |
-| **豆包** · **千问办公** · **纳米Work** 等 Agent 产品 | 产品支持 Agent Skills 就导入 | 支持自定义 / 远程 MCP 就添加 | 剪辑需要 | ⚙️ 满足上面三样能力即可，具体入口以各产品文档为准 |
-| **Claude 桌面端 / claude.ai** | 设置里上传技能包 | 连接器 → Add custom connector | ⚠️ 只有沙盒 | 写稿、设计场景、报价、生成都能做；本机剪辑需要能跑命令的 Agent |
+生成走你自己的即梦账号（OAuth 浏览器登录，不复制任何 key），**不再需要接远程 MCP 服务器**。
 
-> 如果你的 Agent 只能「MCP + 聊天」、不能跑本机命令，也可以先用它**写稿、报价、生成**片段；剪辑这几步再交给 Claude Code / Codex，或者照 [`SKILL.md`](skills/digital-human-koubo/SKILL.md) 里的命令手动跑。
+| Agent | 装 Skill | 本机执行命令 | 状态 |
+|---|---|---|---|
+| **Claude Code** | `~/.claude/skills/` | ✅ | ✅ 已实测，这个仓库就是用它做的 |
+| **Codex**（CLI / 桌面） | `~/.codex/skills/` | ✅ | ✅ 预期可用（同一套脚本） |
+| **OpenClaw** | 放进 OpenClaw 的技能目录（见其文档） | ✅ | ⚙️ 应可用 |
+| **WorkBuddy** | 技能 → 导入文件夹 / 压缩包 | ✅ 桌面端 Agent | ⚙️ 应可用，菜单名以 App 当前版本为准 |
+| **豆包** · **千问办公** · **纳米Work** 等 Agent 产品 | 产品支持 Agent Skills 就导入 | 剪辑需要 | ⚙️ 满足两样能力即可，具体入口以各产品文档为准 |
+| **Claude 桌面端 / claude.ai** | 设置里上传技能包 | ⚠️ 只有沙盒 | 写稿、设计场景、报价能做；本机生成与剪辑需要能跑命令的 Agent |
+
+> 如果你的 Agent 只能聊天、不能跑本机命令，也可以先用它**写稿和设计拍表**；生成与剪辑交给 Claude Code / Codex，或照 [`SKILL.md`](skills/digital-human-koubo/SKILL.md) 里的命令手动跑。
 
 ---
 
@@ -125,61 +126,49 @@ mkdir -p ~/.codex/skills && cp -R skills/digital-human-koubo skills/finance-expl
 cd skills && zip -r ../digital-human-skills.zip digital-human-koubo finance-explainer && cd ..
 ```
 
-### 3 · 接入 Renoise MCP（AI 视频 / 图片生成）
+### 3 · 安装即梦官方 dreamina CLI（AI 视频 / 图片生成）
 
-先去 **[renoise.ai](https://renoise.ai/mcp?utm_medium=xcom&utm_source=official)** 注册账号。登录都在浏览器里完成，不用复制任何 API key。
+生成走你自己的即梦账号和积分（积分每日可领）。一条命令安装，浏览器 OAuth 授权，不复制任何 key：
 
-| Agent | 怎么接 |
-|---|---|
-| Claude Code | `/plugin marketplace add ArcoCodes/renoise-plugins-official`，再 `/plugin install renoise@renoise-plugins-official` |
-| Codex | `codex mcp add renoise --url https://renoise.ai/api/public/mcp`，再 `codex mcp login renoise` |
-| OpenClaw | `openclaw plugins install renoise --marketplace ArcoCodes/renoise-plugins-official` |
-| Claude 桌面端 / claude.ai | 设置 → 连接器 → **Add custom connector** → 名称 `Renoise`，地址 `https://renoise.ai/api/public/mcp` |
-| WorkBuddy、Cursor、Windsurf、Cline、豆包、千问、纳米Work…… | 添加远程 MCP 服务器，地址 `https://renoise.ai/api/public/mcp`（常见配置：`{"mcpServers":{"renoise":{"url":"https://renoise.ai/api/public/mcp"}}}`） |
+```bash
+curl -s https://jimeng.jianying.com/cli | bash   # 安装 dreamina CLI（Windows 用 Git Bash 同款命令）
+dreamina login                                   # 浏览器打开链接、输授权码即可
+dreamina user_credit                             # 查余额，能查到就通了
+```
 
-官方最新装法：**[renoise.ai/plugin](https://renoise.ai/plugin)**。装好后问 Agent 一句「查一下我的 Renoise 余额」，能查到就连上了。
+> 日常用 `seedance2.0mini`（实测 720p ≈6 即梦积分/秒，基本 0 排队）；**不要用 `seedance2.0fast`**——晚高峰免费队列会排几小时。`seedance2.5` 最长 30 秒、VIP 专属。
 
-### 4 · 本机工具（下载、质检、剪辑要用）
+### 4 · 安装 apiz CLI（台词核验 / TTS / 克隆声）
+
+```bash
+curl -fsSL https://data.apiz.ai/cli/install.sh | bash   # 或见 apiz.ai 官网
+apiz auth login                                          # 存 API key
+```
+
+### 5 · 本机工具（生成、质检、剪辑要用）
 
 | 工具 | macOS | Windows | Linux |
 |---|---|---|---|
 | ffmpeg | `brew install ffmpeg` | `winget install Gyan.FFmpeg` | `sudo apt install ffmpeg` |
 | Python 3 + numpy + Pillow | `brew install python` 后 `python3 -m pip install numpy pillow` | `winget install Python.Python.3.12` | `sudo apt install python3-pip` |
 | Node.js 18+（Remotion） | `brew install node` | `winget install OpenJS.NodeJS.LTS` | `nvm install --lts` |
-| whisper.cpp（`whisper-cli`） | `brew install whisper-cpp` | [Releases 下载](https://github.com/ggerganov/whisper.cpp/releases) | [源码编译](https://github.com/ggerganov/whisper.cpp) |
-| whisper 模型 | 下载 [`ggml-medium-q5_0.bin`](https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium-q5_0.bin) 放到 `~/models/`（或 `export WHISPER_MODEL=模型路径`） | 同左 | 同左 |
+| edge-tts（可选，旁白/指定音色） | `python3 -m pip install edge-tts` | 同左 | 同左 |
+| whisper.cpp（可选，零积分回听） | `brew install whisper-cpp` | [Releases 下载](https://github.com/ggerganov/whisper.cpp/releases) | [源码编译](https://github.com/ggerganov/whisper.cpp) |
 
 一条命令检查：已经装好的打勾跳过，缺什么列出多种装法：
 ```bash
 bash ~/.claude/skills/digital-human-koubo/scripts/doctor.sh
 ```
 
-**景深字**（文字在人身后）用的是 Apple Vision，需要 **macOS**；其余功能跨平台。
+**景深字**（文字在人身后）用的是 Apple Vision，需要 **macOS**；其余功能跨平台（含 Windows，本仓库即在 Windows 上实跑）。
 
-### 5 · 音效与占位配乐
+### 6 · 音效与占位配乐
 
 仓库**不带任何第三方音频**。用代码合成一套原创音效（30 个）和一条占位配乐（无版权）：
 ```bash
 python3 ~/.claude/skills/digital-human-koubo/scripts/make_assets.py
 ```
-`new_edit.sh` 每次起新工程也会自动跑。想要更好的配乐，把你有授权的曲子放到 `<工程>/public/music/bgm.mp3` 覆盖即可。
-
-### 6 ·（可选）小米 MiMo 语音：音色设计 / 声音克隆
-
-默认用 Grok 自带的声音（口型最准）。想要设计一个新音色、用你自己的克隆声音，或者做纯旁白视频，Skill 会调用 **小米 MiMo TTS**：
-
-1. 去 **[platform.xiaomimimo.com](https://platform.xiaomimimo.com/)** 注册并创建 API Key。写这份文档时小米的 TTS 模型是限时免费的，具体以官网当前价格为准。
-2. 把 Key 放进环境变量，或写到 `~/.config/ai-teardown/mimo.env`：
-   ```bash
-   mkdir -p ~/.config/ai-teardown && cat > ~/.config/ai-teardown/mimo.env <<'EOF'
-   MIMO_API_KEY=你的key
-   MIMO_BASE_URL=https://api.xiaomimimo.com/v1
-   EOF
-   chmod 600 ~/.config/ai-teardown/mimo.env
-   ```
-3. 只克隆**你本人**的声音，或明确授权给你的声音。
-
-> 注意：Grok 的口型跟的是它自己生成的声音。事后换成别的声音，口型会差约 100 毫秒（画中画看不出，全屏特写看得出）。想用自己的录音又要口型准，换「音频驱动口型」的模型，比如 OmniHuman（Skill 里有写法）。
+`new_edit.sh` / `setup_engine.sh` 每次起新工程也会自动跑。想要更好的配乐，把你有授权的曲子放到 `<工程>/public/music/bgm.mp3` 覆盖即可。
 
 ---
 
@@ -190,7 +179,7 @@ python3 ~/.claude/skills/digital-human-koubo/scripts/make_assets.py
 ```text
 用我的数字人 Skill 讲这段：……（粘贴你的内容）
 用这个数字人做一条 30 秒直播间广告：WorkBuddy 上手课，10 节课 99 元，原价 999。
-做一条 3 分钟的小林式解说：硅谷银行为什么会暴雷。
+做一条 90 秒的财经解说：15 倍牛股一天跌掉三成六。
 讲到这几个国家的时候加地图航线 / 把「¥99」放在她身后 / 开场加个预告闪回。
 把包装组件图鉴发我看看
 ```
@@ -206,11 +195,11 @@ python3 ~/.claude/skills/digital-human-koubo/scripts/make_assets.py
 ## 做你自己的数字人
 
 1. 选一张照片：正脸、光线均匀、头发不挡脸、嘴闭着。**只用你本人或明确授权的照片。**
-2. 让 Agent 生成四视图（正面、两个侧面、背面）：GPT Image 2.5，2k，约 23 积分，保证换角度不变脸。
-3. 同一张图、同一句台词做多模型对比（Grok Video 1.5 vs Wan 3.0，各 8 秒），选一个。
-4. 把参考图上传到 Renoise，把 `material:<id>` 写进 `skills/digital-human-koubo/persona.json`（`renoise.reference_material`；第二位主播写在 `other_hosts.me`）。
+2. 让 Agent 生成定妆照或四视图（`dreamina image` / `image edit`，16:9 2k，几个即梦积分），保证换角度不变脸；把图放进 `assets/`。
+3. 用同一段台词先拍一版（`dreamina_beats.py` / `generate_segments.py`，几积分），看脸像不像、口型对不对、声音喜不喜欢。
+4. 把参考图路径写进 `skills/digital-human-koubo/persona.json`（`media.reference_image`，或 `other_hosts.<名字>.reference_image`）。
 
-详细步骤见 [`references/new-avatar.md`](skills/digital-human-koubo/references/new-avatar.md)。仓库里的 `material:` ID 属于作者的账号，你的账号用不了，这是正常的。
+详细步骤见 [`references/new-avatar.md`](skills/digital-human-koubo/references/new-avatar.md)。
 
 <p align="center"><img src="docs/images/scene-composite.jpg" width="720" alt="参考照 → 合成直播间"></p>
 
@@ -282,15 +271,15 @@ python3 scripts/cutout_video.py public/main.mp4 public/main_cut_s4.webm --from 1
 
 ---
 
-## 成本参考（真实跑过的数）
+## 成本参考（即梦通道实测）
 
-| 视频 | 生成内容 | 积分 |
+| 视频 | 生成内容 | 即梦积分 |
 |---|---|---|
-| 直播间广告 9:16 27 秒 | 1 张场景图 + 5 段 Grok 口播（720p） | **482** |
-| 教程第二期 16:9 4 分 36 秒 | 32 段口播（全屏 720p / 画中画 480p）+ 演示素材 | 约 3250 |
-| 数字人升级版 16:9 5 分 55 秒 | 30 段新片段 + 7 张场景图，复用 17 段 | 约 3409 |
+| **财经解说 16:9 90 秒（本仓库实测）** | 定妆照 + 3 空镜图 + 6 拍出镜口播（720p） | **约 350** |
+| 直播间广告 9:16 27 秒（换算） | 1 张场景图 + 5 段口播（720p） | **约 170** |
+| 4 分钟教程 16:9（换算） | 约 30 段口播 + 场景图 | **约 1,100** |
 
-写文档时的价格：Grok Video 1.5 720p 17 积分/秒、480p 10 积分/秒；GPT Image 2.5 2k 23 积分/张。以 Agent 实时报价为准。
+价格基准（2026-10 实测）：`seedance2.0mini` 720p ≈ **6 即梦积分/秒**（积分每日可领，近似零现金成本）；`seedance2.5`（30 秒长段/精修，VIP）单价用前先拍 4 秒校准。图片生成几个积分一张。以 Agent 实时报价为准；apiz 侧台词核验约 10 积分/段（0.1 元）。
 
 ## 目录结构
 
@@ -298,27 +287,29 @@ python3 scripts/cutout_video.py public/main.mp4 public/main_cut_s4.webm --from 1
 skills/
   digital-human-koubo/            主 Skill
     SKILL.md                      Agent 照着执行的流程
-    persona.json                  主播形象、声音描述、提示词模板
+    persona.json                  主播形象、参考图、三通道配置、提示词模板
     references/                   风格菜单 · 包装组件 · 手法库 · 安装 · 拆解报告
-    scripts/                      build_tasks · rangedl · assemble · align · check_edit · cutout_video
-                                  voicefx/unify · doctor · new_edit · make_assets
+    scripts/                      build_plan · generate_segments · tts · assemble · align
+                                  rangedl · check_edit · cutout_video · voicefx/unify
+                                  doctor · new_edit · make_assets
     templates/
       huazi-916/                  9:16 数据驱动花字口播模板（edit.json）
       packaging/                  48 个组件 + 图鉴工程
       reference/                  launch-169 · tutorial-169 · multihost-169
     assets/                       风格预览图 · 包装图鉴 · 数字人参考图
-  finance-explainer/              风格 A 引擎（episode.json 拍表、检索工具）
+  finance-explainer/              风格 A 引擎（episode.json 拍表、dreamina_beats、narrate_edge、检索工具）
 docs/                             README 用的图片、GIF 预览、封面帧
 ```
 
 ## 踩过的坑（Skill 里都处理了）
 
-- Grok 横屏口播偶尔**自己烧字幕**，提示词写了也挡不住 → 抽帧检查，重拍那段。
-- whisper 会把中文数字写成阿拉伯数字（九百九十九 → 999），准确率会掉，但其实没念错 → 先听再决定重拍。
-- Renoise 美国 CDN 并行下载会断成半截 → `rangedl.py` 6 段 Range 续传 + 解码校验。
-- Grok 9:16 720p 是 **720×1280**，别拉成别的比例。
+- Seedance 横屏口播偶尔**自己烧字幕**，提示词写了也挡不住 → 抽帧检查，重拍那段（apiz 还有字幕擦除工具可救）。
+- `multimodal2video` **不跟随参考图比例**（默认 16:9）→ `dreamina_beats.py` / `build_plan.py` 已自动传 `--ratio`。
+- `seedance2.0fast` 晚高峰免费队列能排几小时 → 日常一律 `seedance2.0mini`（mini 专属队列基本 0 排队）。
+- whisper 会把中文数字写成阿拉伯数字（九百九十九 → 999），准确率会掉，但其实没念错；即梦通道默认改用 `apiz align` 核验（实测零错字）。
+- 生成视频轨和人声差几毫秒叠在一起会刺耳（梳状滤波）→ 主播视频轨一定静音，人声单独铺。
 - expo 缓动到不了终点（99.9 四舍五入成 100）→ 计数动画结束时强制落在精确值。
-- 主播视频轨一定要静音；两条声音差几毫秒叠在一起会刺耳（梳状滤波）。
+- Windows 渲染：Remotion 输出别接 `| head` 这类会提前关管道的命令，会把渲染进程掐死。
 
 ## 使用红线
 
@@ -326,15 +317,16 @@ docs/                             README 用的图片、GIF 预览、封面帧
 - 每条片子标「内容由 AI 数字人演绎」，场景和动物片段标「AI 生成」。
 - 不编数字、价格、优惠、评价；画面上的示意数据要标「示意」。
 - 不用网络梗图、影视剧截图、明星照片；梗图类组件用你自己数字人生成的原创贴纸。
-- 积分只在你确认报价之后才花。
+- 积分只在你确认报价之后才花（生成脚本不带 `--yes` 都是干跑）。
 
 ## 许可与第三方
 
 - 代码和文档：[MIT](LICENSE) © 2026 Berryxia（andyhuo520）。
 - 渲染用的 **[Remotion](https://www.remotion.dev/)** 有自己的许可：个人和 3 人以内的公司免费，更大的公司需要购买[公司授权](https://www.remotion.pro/)。
+- 生成走**即梦（Dreamina）**官方 CLI 与你自己的即梦账号积分，**apiz.ai**（对齐核验 / TTS / 克隆声）用自己的 API key，**edge-tts**（旁白占位）为微软公共服务的 Python 封装——用量与内容合规以各服务条款为准。
 - 动态表情：[Google Noto Emoji Animation](https://googlefonts.github.io/noto-emoji-animation/)（CC BY 4.0），视频里请署名「Animated emoji: Google Noto」。
 - 地图：[world-atlas](https://github.com/topojson/world-atlas)（ISC，数据来自 Natural Earth，公有领域）、[d3-geo](https://github.com/d3/d3-geo)、[topojson-client](https://github.com/topojson/topojson-client)（ISC）。涉及中国边界的正式发布内容，请按国内相关规范另行核对。
-- 语音识别：[whisper.cpp](https://github.com/ggerganov/whisper.cpp)（MIT）。生成走 [Renoise](https://renoise.ai/mcp?utm_medium=xcom&utm_source=official)（用你自己的账号和积分）；可选 TTS 用 [小米 MiMo](https://platform.xiaomimimo.com/)。
+- 语音识别（可选）：[whisper.cpp](https://github.com/ggerganov/whisper.cpp)（MIT）。
 - WorkBuddy 示例里的课程截图来自作者自己的课程。示例视频是作者的作品，请不要当成自己的作品二次上传。
 
 详见 [THIRD_PARTY.md](THIRD_PARTY.md)。

@@ -32,7 +32,7 @@
 选完把结果写进工程目录 `brief.json`：
 ```json
 { "style": "B", "ratio": "9:16", "length_s": 60, "huazi": "标准", "host": ["tank"], "languages": ["zh"],
-  "platform": "抖音", "cta": "去试试 Renoise", "showcase": ["show/a.mp4"], "notes": "用户说别太吵" }
+  "platform": "抖音", "cta": "去试试新工具", "showcase": ["show/a.mp4"], "notes": "用户说别太吵" }
 ```
 后面的写稿、切段、剪辑全按 brief.json 来；用户中途改主意就改这个文件。
 

@@ -99,12 +99,13 @@ def main():
 
     only = arg("--only")
     only = set(only.split(",")) if only else None
-    beats = [b for b in ep["beats"] if b.get("narration") and (not only or b["id"] in only)]
+    beats = [b for b in ep["beats"] if b.get("narration") and b.get("host") != "off"
+             and (not only or b["id"] in only)]   # host=off 的拍是纯空镜，不需要出镜片段
     if mode == "audio":
         beats = [b for b in beats if (voice / "audio" / f"{b['id']}.wav").exists()
                  or (voice / "audio" / f"{b['id']}.mp3").exists()]
-        missing = [b["id"] for b in ep["beats"] if b.get("narration") and b["id"] not in {x["id"] for x in beats}
-                   and (not only or b["id"] in only)]
+        missing = [b["id"] for b in ep["beats"] if b.get("narration") and b.get("host") != "off"
+                   and b["id"] not in {x["id"] for x in beats} and (not only or b["id"] in only)]
         if missing:
             print(f"⚠ 无音频、跳过（先跑 align_recording.py / narrate_edge.py）：{'、'.join(missing)}")
 
