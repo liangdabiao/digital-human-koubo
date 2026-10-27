@@ -42,7 +42,7 @@ description: 「小Lin说」式财经/科技解说视频工作室：选题打分
 
 ### 5. 数字人（references/production.md）
 - 定妆照：`dreamina image generate` 16:9 2k（即梦积分），书房中景、两侧留白放图表、有专属道具（霓虹名字灯、玩偶）。用户给了原创脸就 `image edit` 作参考，否则纯文字生成。
-- **方案 A（multimodal2video，音频驱动，首选）：**定妆照 + 该拍音频 → 口型跟最终声音逐字同步（Seedance 原生联合生成）；mini 720p ≈6 即梦积分/秒，自录/克隆声零换声。`python3 scripts/dreamina_beats.py episode.json voice --mode audio`（干跑报价 → `--yes` 提交）。
+- **方案 A（multimodal2video，音频驱动，首选）：**定妆照 + 该拍音频 → 口型跟最终声音逐字同步（Seedance 原生联合生成）；mini 720p ≈6 即梦积分/秒，自录/克隆声零换声。`python3 scripts/dreamina_beats.py episode.json voice --mode audio`（干跑报价 → `--yes` 提交）。**生成后必跑 `python3 scripts/sync_beats.py episode.json voice gen --public <engine>/public`**：出镜拍改用原生片段自带的音轨（即梦口型与它自己的音频严格对应，勿另铺 TTS 轨猜 offset——实测必错位），并用 apiz align 重打字级时间轴（10 积分/拍）。
 - **方案 B（image2video，原生说话，更有表现力）：**定妆照 + 台词写进提示词 → 模型自己配音，之后 apiz 换音色。`--mode native`，出片后 `grok_beats.py` 对齐写 host.json。
 - 单拍 >14 秒自动升 seedance2.5（VIP，30 秒上限，单价未实测先校准）。小窗（pip）用 3 段 10 秒通用说话循环轮换即可，省掉约 40% 口型费用。
 - 先做 10 秒测试：抽帧看停顿处嘴是否闭合、人物是否走样，再批量。

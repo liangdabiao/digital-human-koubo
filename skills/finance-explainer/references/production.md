@@ -26,7 +26,7 @@
 **推荐组合**：有最终音频（自录/克隆声）的拍全部走 A；要表现力的全屏特写镜头可用 B + 事后换音色；圆形小窗和被空镜盖住的拍用 B 480p（只取声音氛围）或 3 段 10 秒通用说话循环轮换，省约 40% 口型费用。
 
 ### 接入
-- A：`dreamina_beats.py --mode audio --public <engine>/public` 直接产出 host.json（clips + offset）。offset 预填 0：拿第一拍截帧对一下口型起点，差几帧改 host.json。
+- A：`dreamina_beats.py --mode audio --public <engine>/public` 出片段 → **`sync_beats.py` 收尾（必跑）**：出镜拍一律改用原生片段自带的音轨当旁白（即梦口型与它自己的音频严格对应），裁掉首尾后按 apiz align 重打字级时间轴、重建 timings（offset 恒为 0，不需要校准）。教训：另铺 TTS 音轨 + 猜 offset 必错位（片内语音起点 0.08–0.27s 不等，且 Seedance 会对参考音频重新配话速）。
 - B：`dreamina_beats.py --mode native` 产 gen/clips.json → `grok_beats.py episode.json gen/clips.json voice --public <engine>/public`（whisper 逐拍对齐、只裁首尾静音、写 host.json；这段逻辑与生成通道无关，原样可用）。
 - 换音色（B 收尾）：把逐拍音频交给 apiz「保留节奏的换声」——`apiz upload` 音频 + `voice-clone`/`speak` 生成同文本新音色，按 timings 逐拍切回 audio/<id>.wav，重跑 build_timeline；口型不受影响。
 - 抽检口型：截停顿处与说话处的脸部特写对比（停顿应闭嘴）。
