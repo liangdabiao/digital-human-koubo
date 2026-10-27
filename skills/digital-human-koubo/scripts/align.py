@@ -1,23 +1,25 @@
 #!/usr/bin/env python3
-"""逐字时间轴：把 assemble.py 的 cut/<id>.json（whisper 逐字）和文稿对齐，输出剪辑模板用的 tl.json。
+"""逐字时间轴：把 assemble.py 产出的 cut/words/<id>.json（align 或 whisper 统一格式）和文稿对齐，输出剪辑模板用的 tl.json。
 用法：python3 align.py script.json [--out edit/src/tl.json]
 tl.json = {"total": 秒, "segs": [{"i","id","start","end","text","chars":{"字符下标": 秒}}]}（chars 是整片绝对时间）"""
 import json, difflib, sys
 from pathlib import Path
 a = sys.argv[1:]
 if not a: sys.exit(__doc__)
-S = json.load(open(a[0])); Q = {r['id']: r for r in json.load(open('cut/qa.json'))}
+S = json.load(open(a[0], encoding="utf-8")); Q = {r['id']: r for r in json.load(open('cut/qa.json', encoding="utf-8"))}
 out = a[a.index('--out') + 1] if '--out' in a else 'edit/src/tl.json'
-PUNCT = set('，。、：；！？,.:;!? “”「」')
+PUNCT = set('，。、：；！？,.:;!? “”「」\"（）()《》…·—-')
 T0 = 0.0; segs = []
 for i, s in enumerate(S, 1):
     sid, text = s['id'], s['t']; keep = Q[sid]['keep']
+    wj = json.load(open(f'cut/words/{sid}.json', encoding="utf-8"))
     tk = []
-    for t in json.load(open(f'cut/{sid}.json', errors='replace'))['transcription']:
-        a0, a1 = t['offsets']['from'] / 1000, t['offsets']['to'] / 1000; tx = t['text'].strip()
-        if not tx or tx.startswith('['): continue
-        for k, ch in enumerate(tx):
-            if ch not in PUNCT: tk.append((ch.lower(), a0 + (a1 - a0) * k / len(tx)))
+    for w in wj['words']:
+        txt = w['w'].strip()
+        if not txt or txt in PUNCT: continue
+        n = max(1, len(txt))
+        for k, ch in enumerate(txt):
+            if ch not in PUNCT: tk.append((ch.lower(), w['start'] + (w['end'] - w['start']) * k / n))
     clean = [(j, ch.lower()) for j, ch in enumerate(text) if ch not in PUNCT]
     A = ''.join(c for _, c in clean); B = ''.join(c for c, _ in tk)
     sm = difflib.SequenceMatcher(None, A, B, autojunk=False); st = [None] * len(clean)
@@ -29,9 +31,10 @@ for i, s in enumerate(S, 1):
             lo = max([j for j in known if j < k], default=None); hi = min([j for j in known if j > k], default=None)
             st[k] = 0.0 if lo is None and hi is None else (st[hi] if lo is None else (st[lo] + 0.18 * (k - lo) if hi is None else st[lo] + (st[hi] - st[lo]) * (k - lo) / (hi - lo)))
     cov = sum(bl.size for bl in sm.get_matching_blocks()) / max(1, len(A))
-    segs.append(dict(i=i, id=sid, start=round(T0, 3), end=round(T0 + keep, 3), text=text, chars={str(j): round(T0 + st[k], 3) for k, (j, _) in enumerate(clean)}))
-    print(f'{i:2d} {sid:5s} 对齐 {cov:.0%}  {T0:.2f}–{T0 + keep:.2f}')
+    segs.append(dict(i=i, id=sid, start=round(T0, 3), end=round(T0 + keep, 3), text=text,
+                     chars={str(j): round(T0 + st[k], 3) for k, (j, _) in enumerate(clean)}))
+    print(f'{i:2d} {sid:6s} 对齐 {cov:.0%}  {T0:.2f}–{T0 + keep:.2f}')
     T0 += keep
 Path(out).parent.mkdir(parents=True, exist_ok=True)
-json.dump(dict(total=round(T0, 3), segs=segs), open(out, 'w'), ensure_ascii=False, indent=0)
+json.dump(dict(total=round(T0, 3), segs=segs), open(out, 'w', encoding="utf-8"), ensure_ascii=False, indent=0)
 print('total', round(T0, 2), '→', out)

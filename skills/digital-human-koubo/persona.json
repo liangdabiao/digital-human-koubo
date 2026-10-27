@@ -1,67 +1,107 @@
 {
  "name": "白背心数字人",
- "renoise": {
-  "reference_material": "material:329814",
-  "multiview_task": "task:357546",
-  "note": "参考图是用户自己 Grok 视频里的一帧（正脸、闭嘴、头发不挡脸）。换账号或素材过期时，用 assets/avatar_ref.jpg 重新 upload_files 拿新 material id。"
+ "media": {
+  "reference_image": "assets/avatar_ref.jpg",
+  "note": "数字人参考图：本地文件，dreamina CLI 提交时自动上传。换形象/用用户自己的照片时改这个路径（或 build_plan.py --reference 临时覆盖）。"
  },
- "look": "年轻东亚女性，黑色长发带脸侧碎发，白色罗纹背心，竖屏自拍构图，室内自然光",
- "voice": {
-  "engine": "grok-native",
-  "desc": "young friendly female voice, clear and patient but lively, natural pace",
-  "speed_cps": 5.4,
-  "alt_clone": "MiMo mimo-v2.5-tts-voiceclone，参照用 3 段 Grok 口播拼的 ≥12 秒干声（见 references/voice.md）"
- },
- "model": {
-  "name": "grok-video-1.5",
-  "ratio": "9:16",
-  "full_shot_resolution": "720p",
-  "pip_shot_resolution": "480p",
-  "max_seconds": 15,
-  "price_per_second": {
-   "720p": 17,
-   "480p": 10
+ "look": "年轻东亚女生，黑色长发，白色罗纹背心外搭米色针织开衫，坐在温馨室内直播间的桌前，柔和灯光",
+ "channels": {
+  "default": {
+   "label": "即梦 seedance2.0mini（日常主力）",
+   "command": "image2video",
+   "model": "seedance2.0mini",
+   "resolution": "720p",
+   "min_seconds": 4,
+   "max_seconds": 15,
+   "credit_per_second": 6,
+   "note": "2026-10-27 实测 36 积分/6s、0 排队约 8 分钟出片。seedance2.0fast 晚高峰队列会排几小时，不要用。"
+  },
+  "long": {
+   "label": "即梦 seedance2.5（VIP 长段/精修/局部重拍）",
+   "command": "image2video",
+   "model": "seedance2.5",
+   "resolution": "720p",
+   "min_seconds": 4,
+   "max_seconds": 30,
+   "vip_only": true,
+   "credit_per_second": null,
+   "note": "价格未实测：首次使用先拍 4 秒校准单价再报价。比例跟随参考图，不能指定 ratio。"
+  },
+  "audio_ref": {
+   "label": "multimodal2video（指定音色/克隆声，通道 C）",
+   "command": "multimodal2video",
+   "model": "seedance2.0mini",
+   "resolution": "720p",
+   "min_seconds": 4,
+   "max_seconds": 15,
+   "credit_per_second": 6,
+   "audio_max_seconds": 15,
+   "audio_max_segments": 3,
+   "note": "音频作音色+口型参考；提示词写「用参考音频的音色说话，口型与音频同步」。seedance2.5 下 audio≤10。"
   }
  },
- "acts": {
-  "full": "warm eye contact, expressive face, natural hand gestures",
-  "pip": "calm explaining tone, small nods, occasionally glancing down as if reading a screen, small pointing gestures",
-  "vlog": "relaxed lifestyle vlogger sharing a favorite tool, natural small head tilts and nods, one hand comes up briefly in a casual gesture",
-  "depth": "medium shot with generous headroom and plain background visible on both sides of the head and shoulders (for text-behind-subject graphics), calm confident delivery"
+ "voice": {
+  "engine": "seedance-native",
+  "desc": "语气亲切热情，咬字清楚，语速自然",
+  "speed_cps": 5.4,
+  "speed_note": "中文时长估算 = ceil(去标点字数/5.4 + 1.0)；2026-10 实测 25 字 → 6.04 秒，公式准确",
+  "tts": {
+   "engine": "edge-tts",
+   "default": "zh-CN-XiaoxiaoNeural",
+   "map": {
+    "zh": "zh-CN-XiaoxiaoNeural",
+    "zh-male": "zh-CN-YunxiNeural",
+    "en": "en-US-EmmaMultilingualNeural",
+    "ja": "ja-JP-NanamiNeural",
+    "ko": "ko-KR-SunHiNeural"
+   },
+   "note": "只在三种场景用：纯旁白/画外音段、用户指定音色、克隆声（apiz voice-clone）。出镜口播默认走 seedance-native。"
+  }
  },
- "prompt_template": "The young woman in {ref} talks straight into her phone's front camera, same selfie framing, lighting and outfit as the reference, like a friendly Chinese tech vlogger {purpose}: {act}. Handheld selfie feel with only a very slight natural sway. She speaks Mandarin Chinese, clearly lip-synced, in a {voice}:\n“{line}”\nSound: only her voice and quiet room tone, no music, no subtitles, no on-screen text.",
- "disclosure": "内容由 AI 数字人演绎",
+ "prompt_template": "竖屏直播画面，{look}。画面中的她面对镜头，像{purpose}一样看镜头说话，嘴部始终清晰可见，{act}。她用{language}清晰地说：\"{line}\" {voice_desc}。画面无字幕无文字。",
+ "prompt_template_landscape": "横屏画面，{look}。画面中的她面对镜头，像{purpose}一样看镜头说话，嘴部始终清晰可见，{act}。她用{language}清晰地说：\"{line}\" {voice_desc}。画面无字幕无文字。",
+ "prompt_template_audio_ref": "画面中的她面对镜头说话，嘴部始终清晰可见，{act}。参考音频就是她的声音：用参考音频的音色和台词说话，口型与音频严格同步。{voice_desc}。画面无字幕无文字。",
+ "acts": {
+  "full": "表情生动自然，配合内容有自然的手势",
+  "pip": "平静讲解的语气，偶尔点头、眼神瞟向下方像在看提词板，小幅度手势",
+  "vlog": "随意自拍的生活博主口吻，自然的小幅度头部动作，手势轻松",
+  "depth": "中景构图，头顶留白，头两侧露出干净的背景（为文字在人身后留位），从容自信地讲"
+ },
+ "language_names": {
+  "zh": "普通话",
+  "en": "English",
+  "ja": "日语",
+  "ko": "韩语",
+  "fr": "法语",
+  "es": "西班牙语",
+  "ar": "阿拉伯语"
+ },
  "other_hosts": {
   "me": {
-   "name": "用户本人数字人（藏青 polo）",
-   "reference_material": "material:338484",
-   "asset": "assets/host_me_polo.jpg",
+   "name": "用户本人数字人",
+   "reference_image": "assets/host_me.jpg",
    "ratio": "16:9",
-   "note": "用户本人照片，只给用户自己的片子用；横屏照直接出横屏口播",
-   "voice": "warm, steady, confident male voice around 35 years old, natural pace",
-   "prompt_template": "The man in {ref} talks straight to the camera, same framing, gray studio backdrop, navy polo shirt, glasses and soft lighting as the reference, like a friendly tech blogger {purpose}: {act}. Locked-off camera, no zoom. He speaks {language}, clearly lip-synced, in a {voice}:\n“{line}”\nSound: only his voice and quiet room tone, no music, no subtitles, no captions, no on-screen text of any kind."
+   "note": "放用户本人照片（只用本人或授权者的）；横屏照直接出横屏口播，用 prompt_template_landscape",
+   "voice_desc": "语气沉稳自信，咬字清楚，语速自然"
   },
   "cat": {
    "name": "橘猫店长",
-   "still_task": "task:360205",
+   "reference_image": "assets/host_cat.jpg",
    "ratio": "9:16",
-   "voice": "cute, playful small high-pitched voice",
-   "note": "提示词要写 its mouth clearly opens and closes in sync with the words"
+   "note": "定妆照不存在时先按 references/new-avatar.md 生成；提示词要写「它的嘴清楚地对上台词开合」",
+   "voice_desc": "音色可爱俏皮，语速稍快"
   },
   "dog": {
-   "name": "柴犬新闻主播",
-   "still_task": "task:360206",
+   "name": "柴犬主播",
+   "reference_image": "assets/host_dog.jpg",
    "ratio": "16:9",
-   "voice": "deep, serious male TV news-anchor voice"
+   "voice_desc": "低沉认真的新闻主播腔"
   }
  },
- "languages_tested": {
-  "en": "100%",
-  "ja": "100%",
-  "ko": "94%",
-  "fr": "100%",
-  "es": "100%",
-  "ar": "99%",
-  "note": "2026-10 第三期实测 whisper 回听准确率；台词提前翻好再写进提示词"
- }
+ "qc": {
+  "align_cost_per_segment": 10,
+  "accuracy_threshold": 0.85,
+  "note": "apiz align 做逐段台词核验+字级时间轴（替代 whisper 回听，2026-10 实测零错字）；whisper-cli 可用时 --qc whisper 零成本。"
+ },
+ "disclosure": "内容由 AI 数字人演绎"
 }

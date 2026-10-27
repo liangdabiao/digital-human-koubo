@@ -1,44 +1,49 @@
 # 安装引导（只在缺的时候用）
 
-原则：**已经有的一句话带过，不提安装**；缺什么才给装法。装法给多种：先放用户当前在用的那种（标「推荐」），其余列在下面让用户挑。装完再检查一次确认。
+原则：**已经有的一句话带过，不提安装**；缺什么才给装法。装法给多种：先放用户当前在用的那种（标「推荐」），其余列在下面让用户挑。装完再检查一次确认。装好后跑 `bash scripts/doctor.sh` 核验。
 
-## 1. Renoise MCP
+## 1. dreamina CLI（即梦官方，生成主力）
 
 ### 怎么判断有没有
-直接调 Renoise 的 `get_account`：
-- 成功 → 「Renoise 已连接，余额 X 积分」，继续干活。
-- 工具不存在 / 调用报未连接 → 缺，按下面引导。
-- 报「disabled in connector settings」→ 不是没装，是某个工具被关了：让用户在连接器设置里把它打开。
-- 报未登录 / 授权过期 → 不用重装，重新登录授权就行（Claude 连接器点「Connect」；Codex `codex mcp login renoise`）。
+终端跑 `dreamina user_credit`：
+- 返回积分数字 → 「即梦已登录，余额 X 积分」，继续干活。
+- 报找不到命令 → 没装，按下面装。
+- 报未登录 → 不用重装，`dreamina login` 重新授权就行。
 
-### 装法（先有 Renoise 账号；全部走浏览器登录授权，不用复制 API key）
+### 装法（官方安装器，装完自动加 PATH）
+```bash
+curl -s https://jimeng.jianying.com/cli | bash
+```
+装完重开终端（或 `export PATH="$HOME/bin:$PATH"`），然后登录：
+- **推荐**：`dreamina login` —— 浏览器打开它给的 verification_uri，输入 user_code 授权即可（OAuth 设备码，不用复制任何 key）
+- 无浏览器环境：`dreamina login --headless` 拿到设备码 → 任意浏览器打开链接授权 → `dreamina login checklogin --device_code=<device_code>`
 
-还没有账号 → 先去注册：**[https://renoise.ai/mcp?utm_medium=xcom&utm_source=official](https://renoise.ai/mcp?utm_medium=xcom&utm_source=official)**（给用户时原样给这条链接，保留 utm 追踪参数，不要改写成 renoise.ai 首页）。
+账户说明：即梦积分每日可领；`seedance2.0mini` 是日常主力（实测 6 积分/秒、0 排队）；`seedance2.5` 最长 30 秒、VIP 专属。**不要用 seedance2.0fast**——晚高峰免费队列会排几小时。
 
-| 用的是 | 怎么装 |
-|---|---|
-| **Claude 桌面端 / claude.ai 网页** | 设置 → 连接器（Connectors）→ Add custom connector → 名称 `Renoise`，地址 `https://renoise.ai/api/public/mcp` → 继续 → 登录 renoise.ai 点同意 |
-| **Claude Code** | 依次输入 `/plugin marketplace add ArcoCodes/renoise-plugins-official`、`/plugin install renoise@renoise-plugins-official`，首次调用时会打开浏览器登录 |
-| **Codex（CLI / 桌面）** | 终端运行 `codex mcp add renoise --url https://renoise.ai/api/public/mcp`，再 `codex mcp login renoise` |
-| **OpenClaw** | `openclaw plugins install renoise --marketplace ArcoCodes/renoise-plugins-official` |
-| **其他支持远程 MCP 的客户端**（Cursor、Windsurf、Cline 等） | 在它的 MCP 配置里加一个远程服务器，地址 `https://renoise.ai/api/public/mcp`。常见写法：`{"mcpServers": {"renoise": {"url": "https://renoise.ai/api/public/mcp"}}}`（字段名以客户端文档为准） |
-| **不确定 / 想看最新** | 打开 renoise.ai/plugin，官网列了各客户端的最新装法 |
+## 2. apiz CLI（台词核验 / TTS / 克隆声 / 备用生成）
 
-装完：Claude 系要重开对话（或在连接器里点重连）才能看到工具；Codex 重开会话。然后再调一次 `get_account`。
+### 怎么判断有没有
+`apiz account balance` 返回余额 → 已就绪（用于 align QC：核验台词 + 出字级时间轴，10 积分/段）。
 
-## 2. 本机环境（剪辑时才需要）
-`bash scripts/doctor.sh` 会逐项检查：有的打 ✓ 跳过，缺的才列出多种装法。**系统软件让用户自己装，不要替用户执行安装命令**（Python 包可以在用户同意后帮装）。
+### 装法
+```bash
+curl -fsSL https://data.apiz.ai/cli/install.sh | bash     # 或见 apiz.ai 官网安装文档
+apiz auth login                                            # 存 API key（sk-…）
+```
 
-| 缺的 | macOS | Windows | Linux | 其他 |
+## 3. 本机环境
+`bash scripts/doctor.sh` 逐项检查：有的打 ✓ 跳过，缺的才列装法。**系统软件让用户自己装，不要替用户执行安装命令**（Python 包可以在用户同意后帮装）。
+
+| 缺的 | macOS | Windows | Linux | 说明 |
 |---|---|---|---|---|
-| ffmpeg | `brew install ffmpeg` | `winget install Gyan.FFmpeg` 或 `choco install ffmpeg` | `sudo apt install ffmpeg` | 官网 ffmpeg.org 下载 |
-| Python 3 | `brew install python` | `winget install Python.Python.3.12` | `sudo apt install python3 python3-pip` | python.org 下载；或 conda |
-| numpy / Pillow | `python3 -m pip install numpy pillow` | 同左 | 同左 | `conda install numpy pillow` |
-| Node 18+ | `brew install node` | `winget install OpenJS.NodeJS.LTS` | `sudo apt install nodejs npm` 或 nvm | nodejs.org 下载；`nvm install --lts` |
-| whisper-cli | `brew install whisper-cpp` | 从 github.com/ggerganov/whisper.cpp Releases 下载 | 源码编译（`cmake -B build && cmake --build build`） | — |
-| whisper 模型 | 下载 `ggml-medium-q5_0.bin`（huggingface.co/ggerganov/whisper.cpp）放到 `~/models/` | 同左 | 同左 | 或 `export WHISPER_MODEL=模型路径` |
+| ffmpeg | `brew install ffmpeg` | `winget install Gyan.FFmpeg` | `sudo apt install ffmpeg` | 抽帧/拼接/响度 |
+| Python 3 | `brew install python` | `winget install Python.Python.3.12` | `sudo apt install python3 python3-pip` | 全部流程脚本 |
+| numpy / Pillow | `python3 -m pip install numpy pillow` | 同左 | 同左 | 声音统一 / 预览图 |
+| Node 18+ | `brew install node` | `winget install OpenJS.NodeJS.LTS` | nvm / apt | Remotion 剪辑 |
+| edge-tts（可选） | `pip install edge-tts` | 同左 | 同左 | 只有旁白段/指定音色才需要 |
+| whisper.cpp（可选） | `brew install whisper-cpp` + 模型放 `~/models/` | Releases 下载 | 源码编译 | 默认 QC 走 apiz align；想零积分回听再装 |
 
 Remotion 不用单独装：`scripts/new_edit.sh` 起工程时会先从本机已有的 Remotion 工程克隆，没有才 `npm install`；npm 源连不上时换镜像 `npm config set registry https://registry.npmmirror.com`。
 
-## 3. 数字人形象
-persona.json 的 reference_material 在当前账号能用（`view_image` 能打开）→ 直接用。用不了（换了账号、素材过期、别人的包）→ 按 references/new-avatar.md 用用户自己的照片重做。
+## 4. 数字人形象
+persona.json → `media.reference_image` 指向本地参考图（默认 `assets/avatar_ref.jpg`，仓库自带）。要换成用户自己的形象：把照片放进来改路径即可；要做全新四视图形象 → 按 references/new-avatar.md。**不要填即梦网页的素材 ID，CLI 只吃本地文件。**
