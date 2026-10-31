@@ -27,6 +27,7 @@
 **H3 硬规则（实测踩坑）**：
 - **首帧图必须本身是真 16:9 横构图**。H3 的 adaptive ratio 严格照抄首帧构图：给模糊补边的 16:9 图，成片就带模糊边条，提示词改不动。竖版照片先用 `fal-ai/nano-banana-pro`（apiz，≈60 积分）扩图成真横版：人物不变居中、两侧自然延伸书房场景，再做 anchor。
 - 参数走 content 数组：`content=[{type:text},{type:image_url,image_url:{url},role:first_frame}]`、`duration` 4–15 整数、`resolution` 480p/768P/1080p。
+- **带货/多参考**：role 规则实测——不带 role 的图 = 首帧（最多 1 张）；`role:"reference_image"` 是参考图，**可与另两图连用但不能与 first_frame 混用**。带货套路：两张图都标 `reference_image`，提示词用「参考图1是主播的样子和她的场景…参考图2是她的商品…」自然语言指代（2026-10-31 实测：商品还原、人物一致、口播零错字，10s 127 积分）。
 - 提示词要点：固定机位中景、嘴部清晰、真实摄影质感、与参考图一致、无字幕无水印。
 - **生成后必跑 `sync_beats.py`**（原生音轨接管 + apiz align 重打轴，offset=0）。
 - 裁切输出必须 CFR 30fps（VFR 会让 Remotion 报 No frame found）。
