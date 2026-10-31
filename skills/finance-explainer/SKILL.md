@@ -1,6 +1,6 @@
 ---
 name: finance-explainer
-description: 「小Lin说」式财经/科技解说视频工作室：选题打分 → 带出处的事实清单（Exa/Tavily/Serper/Firecrawl）→ 按危机型/收购战型/悖论型骨架写有活人感的口播剧本（拍表 episode.json）→ 主播自录音频对齐跳切（或 edge-tts/MiMo 占位）→ 原创数字人出镜（即梦 dreamina CLI：multimodal2video 音频驱动口型 / image2video 原生说话+事后换音色，seedance2.0mini ≈6 即梦积分/秒）→ 空镜与梗图（即梦 text2video/image + Unsplash/Pexels/Wikimedia）→ Remotion 引擎合成：主播全屏↔缩小↔圆形小窗的「放大缩小」、两代舞台主题（v1 紫色几何 / v2 深色玻璃）、日期贴纸、大数字滚动、术语卡、原文标黄、问题云、竞猜、卡通贴纸独白、章节卡、字幕、BGM 避让与音效。触发：做一期小Lin说那样的视频、财经解说、一口气了解 X、讲讲某个金融事件/收购案/国家经济、数字人口播财经、把这个新闻做成解说视频、复刻财经频道形式。不用于：单支品牌宣传片（用 promo-video）、系列课（用 ai-teardown）、冒充真实主播。
+description: 「小Lin说」式财经/科技解说视频工作室：选题打分 → 带出处的事实清单（Exa/Tavily/Serper/Firecrawl）→ 按危机型/收购战型/悖论型骨架写有活人感的口播剧本（拍表 episode.json）→ 主播自录音频对齐跳切（或 edge-tts/MiMo 占位）→ 原创数字人出镜（默认 apiz MiniMax-H3 原生说话，人物真实感最好；即梦通道为备用——即梦积分很贵且不免费）→ 空镜与梗图（即梦 text2video/image + Unsplash/Pexels/Wikimedia）→ Remotion 引擎合成：主播全屏↔缩小↔圆形小窗的「放大缩小」、两代舞台主题（v1 紫色几何 / v2 深色玻璃）、日期贴纸、大数字滚动、术语卡、原文标黄、问题云、竞猜、卡通贴纸独白、章节卡、字幕、BGM 避让与音效。触发：做一期小Lin说那样的视频、财经解说、一口气了解 X、讲讲某个金融事件/收购案/国家经济、数字人口播财经、把这个新闻做成解说视频、复刻财经频道形式。不用于：单支品牌宣传片（用 promo-video）、系列课（用 ai-teardown）、冒充真实主播。
 ---
 
 # 财经解说工作室（小Lin说式）
@@ -14,13 +14,14 @@ description: 「小Lin说」式财经/科技解说视频工作室：选题打分
 - **不冒充真人。**数字人只用原创形象：纯文字生成，或者用户本人 / 明确同意的人的照片。不用真实创作者（包括小Lin本人）的脸、改过发型眼镜的同一张脸、或从他们视频里克隆的声音——截图式「授权」、加水印加声明都不改变这一点。用户坚持时，说明理由并给原创方案。
 - **不搬内容。**文案、布景、画面全部原创；只学结构和手法。不用影视剧片段、新闻台画面；真实人物用自由协议照片或文字名牌。
 - **每个数字有出处。**事实清单 facts.md 里每条都带日期 + 来源 URL；剧本里的数字必须能在清单里找到；查不到的写 ⚠ 且不进剧本。拿不准的地方让主播直说「这个我没查到」——这本身就是活人感手法。
-- **生成要花用户的积分。**即梦 dreamina CLI 任何提交（不带 `--yes` 是干跑不花钱）之前，先给出模型、提示词、参数、数量、预估总积分（mini 实测 6/秒）和余额，等用户在对话里明确同意。口型视频依赖最终音频：音频没定稿前，不要把整片口型都做掉（会付两次钱）。seedance2.5 单价未实测，首拍先校准。
+- **生成要花用户的真金白银。**apiz（H3 480p 12 积分/秒 + context 7/次）与即梦（积分很贵且**不免费**）都在花钱：任何提交之前，先给出模型、提示词、参数、数量、预估总价和余额，等用户在对话里明确同意。口型视频依赖最终音频：音频没定稿前，不要把整片口型都做掉（会付两次钱）。
 
 ## 流程
 
 ### 0. 准备
 - 检索 key 在 `~/.config/xiaolin-explainer/keys.env`（EXA / TAVILY / SERPER / FIRECRAWL / UNSPLASH / 可选 PEXELS、PIXABAY）。只读这个文件，不要扫描系统找密钥。
-- **即梦 dreamina CLI**：`dreamina user_credit` 有积分即就绪；没装 → `curl -s https://jimeng.jianying.com/cli | bash` 后 `dreamina login`（浏览器授权）。没登录只提示重登，不重装。
+- **apiz CLI（生成主力）**：`apiz account balance` 有余额即就绪；没有 → `apiz auth login`。
+- **即梦 dreamina CLI（备用生成通道）**：`dreamina user_credit` 有积分才可用（积分很贵且不免费，仅 H3 不可用时兜底）；没装 → `curl -s https://jimeng.jianying.com/cli | bash` 后 `dreamina login`。
 - **apiz CLI**（换音色/克隆声/备用）：`apiz account balance` 有余额即可；没有 → `apiz auth login`。
 - 引擎：`bash scripts/setup_engine.sh <项目目录>`（复制 templates/engine，node_modules 优先从本机已有 Remotion 项目 `cp -c` 克隆，失败再 npm install）。
 
@@ -42,13 +43,14 @@ description: 「小Lin说」式财经/科技解说视频工作室：选题打分
 
 ### 5. 数字人（references/production.md）
 - 定妆照：`dreamina image generate` 16:9 2k（即梦积分），书房中景、两侧留白放图表、有专属道具（霓虹名字灯、玩偶）。用户给了原创脸就 `image edit` 作参考，否则纯文字生成。
-- **方案 A（multimodal2video，音频驱动，首选）：**定妆照 + 该拍音频 → 口型跟最终声音逐字同步（Seedance 原生联合生成）；mini 720p ≈6 即梦积分/秒，自录/克隆声零换声。`python3 scripts/dreamina_beats.py episode.json voice --mode audio`（干跑报价 → `--yes` 提交）。**生成后必跑 `python3 scripts/sync_beats.py episode.json voice gen --public <engine>/public`**：出镜拍改用原生片段自带的音轨（即梦口型与它自己的音频严格对应，勿另铺 TTS 轨猜 offset——实测必错位），并用 apiz align 重打字级时间轴（10 积分/拍）。
+- **方案 A（MiniMax-H3，默认主力）：**定妆照（**必须真 16:9 横构图**——竖版照片先用 nano-banana-pro 扩图，模糊补边会被 H3 照抄成边条）+ 台词写进提示词 → 原生配音，人物真实感最好（2026-10-31 用户定版）。`python3 scripts/h3_beats.py episode.json anchor.png gen`（480p 12 apiz 积分/秒 + context 7/次）。**生成后必跑 `python3 scripts/sync_beats.py episode.json voice gen --public <engine>/public`**：出镜拍用原生片段自带音轨 + apiz align 重打轴（offset=0）。
+- **方案 B（即梦 multimodal2video，备用）：**H3 不可用时才用。定妆照 + 该拍音频 → 口型跟最终声音逐字同步；即梦积分很贵不免费。`dreamina_beats.py --mode audio`，生成后同样必跑 sync_beats.py。
 - **方案 B（image2video，原生说话，更有表现力）：**定妆照 + 台词写进提示词 → 模型自己配音，之后 apiz 换音色。`--mode native`，出片后 `grok_beats.py` 对齐写 host.json。
-- 单拍 >14 秒自动升 seedance2.5（VIP，30 秒上限，单价未实测先校准）。小窗（pip）用 3 段 10 秒通用说话循环轮换即可，省掉约 40% 口型费用。
+- H3 单拍 4–15 秒（超长拍先拆）。小窗（pip）用 3 段 10 秒通用说话循环轮换即可，省掉约 40% 口型费用。
 - 先做 10 秒测试：抽帧看停顿处嘴是否闭合、人物是否走样，再批量。
 
 ### 6. 空镜 / 梗 / 贴纸
-- 空镜：`dreamina text2video --prompt "…slow dolly, no readable text or logos…" --duration 5 --video_resolution 720p --model_version seedance2.0mini`（≈30 积分）；或 `scripts/fetch_stock.py <id> "<关键词>" engine/public/assets --kind photo|video`（自动记 credits.json，片尾署名）。
+- 空镜静图：`apiz generate --model fal-ai/nano-banana-pro --params '{"aspect_ratio":"16:9"}'`（≈60 积分，真实感好）；动态空镜可用 `dreamina text2video`（即梦积分，贵）或 `scripts/fetch_stock.py <id> "<关键词>" engine/public/assets --kind photo|video`（免费素材库，自动记 credits.json，片尾署名）。
 - 梗图：原创短片（如「小机器人一群围住大机器人」），不用影视片段。
 - 卡通贴纸：`dreamina image generate` 纯绿底 → 抠绿成透明 PNG（脚本见 production.md）。
 
@@ -65,6 +67,6 @@ description: 「小Lin说」式财经/科技解说视频工作室：选题打分
 - references/visual-grammar.md — 16 种画面语法 ↔ 引擎组件 ↔ 拍表字段
 - references/episode-schema.md — episode.json / host.json / assets.json 字段
 - references/production.md — 数字人两方案（即梦）、提示词与价格、素材来源与授权、抠图、渲染与坑
-- scripts/ — research.py、fetch_stock.py、narrate_edge.py（edge-tts 占位）、narrate_mimo.py（可选）、align_recording.py、dreamina_beats.py（逐拍出镜）、grok_beats.py（native 模式对齐）、build_timeline.py、setup_engine.sh；频道分析工具 classify.py / sheet.py / copy_stats.py / vtt2txt.py（拆别的频道时用）
+- scripts/ — research.py、fetch_stock.py、narrate_edge.py（edge-tts 占位）、narrate_mimo.py（可选）、align_recording.py、h3_beats.py（默认出镜通道）、dreamina_beats.py（备用）、sync_beats.py（必跑打轴）、grok_beats.py（native 对齐）、build_timeline.py、setup_engine.sh；频道分析工具 classify.py / sheet.py / copy_stats.py / vtt2txt.py（拆别的频道时用）
 - templates/engine — Remotion 引擎（Episode 合成、Host、Stage、Overlays、Misc 组件，两代主题）
 - examples/ai-chips — 「中国买不到顶级显卡，为什么还是世界第二 AI 大国」：facts.md、10 分钟拍表、2 分钟拍表、录音稿；examples/svb — 硅谷银行 3.5 分钟拍表

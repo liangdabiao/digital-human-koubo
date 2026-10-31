@@ -18,7 +18,7 @@ curl -s https://jimeng.jianying.com/cli | bash
 - **推荐**：`dreamina login` —— 浏览器打开它给的 verification_uri，输入 user_code 授权即可（OAuth 设备码，不用复制任何 key）
 - 无浏览器环境：`dreamina login --headless` 拿到设备码 → 任意浏览器打开链接授权 → `dreamina login checklogin --device_code=<device_code>`
 
-账户说明：即梦积分每日可领；`seedance2.0mini` 是日常主力（实测 6 积分/秒、0 排队）；`seedance2.5` 最长 30 秒、VIP 专属。**不要用 seedance2.0fast**——晚高峰免费队列会排几小时。
+账户说明：即梦积分每日可领；`seedance2.0mini` 是日常主力（实测 6 积分/秒、0 排队）；`seedance2.5` 最长 30 秒、VIP 专属。**不要用 seedance2.0fast**——晚高峰队列会排几小时。
 
 ## 2. apiz CLI（台词核验 / TTS / 克隆声 / 备用生成）
 

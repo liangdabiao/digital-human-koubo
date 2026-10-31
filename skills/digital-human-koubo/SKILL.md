@@ -6,13 +6,13 @@ description: 用固定的数字人形象（白背心数字人 / 用户本人数�
 # 数字人口播（即梦版）
 
 形象、声音、通道、报价规则固定在 `persona.json`；剪辑风格在 `references/style-menu.md`。每次照这里做，出来的就是同一个人、同一种风格。
-生成主力是 **即梦官方 dreamina CLI**（`seedance2.0mini`，实测 6 即梦积分/秒、基本 0 排队）；台词核验和字级打轴用 **apiz CLI**；旁白/指定音色才用 **edge-tts**。
+生成主力是 **apiz MiniMax-H3**（480p 12 积分/秒 + 每次固定 7，人物真实感最好，2026-10-31 用户定版）；即梦 dreamina CLI 是备用通道（**积分很贵且不免费**）；台词核验和字级打轴用 **apiz align**；旁白/指定音色用 **edge-tts**。
 
 ## 红线
 - 生成花的是用户的即梦积分 / apiz 积分：**create 之前先报「段数 · 秒数 · 预估积分 · 余额」，等用户明确同意**。先拍第 1 段给用户确认形象和音色，再批量。重拍也要先报价。
 - `generate_segments.py` 不加 `--yes` 是干跑（不花钱）；`assemble.py --qc align` 不加 `--yes` 只报 QC 花费。工具替你守着红线，但报价的话必须说。
-- 不要用 `seedance2.0fast`：晚高峰免费队列会排几小时；日常一律 `seedance2.0mini`（persona 默认），30 秒长段/精修用 `seedance2.5`（VIP）。
-- seedance2.5 单价未实测：第一次用先拍 4 秒校准，再报整单价。
+- 默认 H3：参数走 content 数组（实现参考 finance-explainer/scripts/h3_beats.py），首帧图必须真 16:9（竖图先 nano-banana-pro 扩图）；生成后出镜拍一律用原生片段自带音轨打轴。
+- 即梦通道（备用）：不要用 `seedance2.0fast`（队列几小时）；`seedance2.5` 单价未实测先拍 4 秒校准。
 - 成片标「内容由 AI 数字人演绎」（即梦自动加「AI 生成」角标，剪辑时可再补一致的声明）；场景、动物片段角上标「AI 生成」。
 - 用户本人的形象（persona.json → other_hosts.me）只用在用户自己的片子里。
 - 「小林式」只学结构和剪辑手法：不用真实创作者的脸、声音、布景和原句。
@@ -29,6 +29,7 @@ description: 用固定的数字人形象（白背心数字人 / 用户本人数�
    - 报未登录 → `dreamina login` 浏览器授权（OAuth 设备码，不用复制任何 key），不用重装。
 2. **apiz CLI**：`apiz account balance` 有余额即可（QC 用）。没有 → `apiz auth login`。
 3. **本机环境**（要剪辑时才需要）：`bash scripts/doctor.sh`。有的打 ✓ 不提；缺的它按系统列装法。
+4. **即梦 dreamina CLI**（备用通道才需要）：`dreamina user_credit` 有积分即就绪。
 4. **数字人形象**：persona.json → media.reference_image 指向的本地文件存在就直接用；要用用户自己的照片 → 把照片放进 assets/ 改路径，全新四视图按 references/new-avatar.md。
 
 ### 0. 看内容 → 推荐风格 → 让用户选
@@ -57,7 +58,7 @@ description: 用固定的数字人形象（白背心数字人 / 用户本人数�
 ### 3. 生成
 `python3 scripts/generate_segments.py plan.json`（干跑复核）→ 用户确认后 `--yes`。
 - 提交 → 自动轮询 → 下载到 `gen/<id>.mp4` → ffprobe 校验 → `gen/manifest.json`。
-- mini 一般 5–10 分钟/段；出现 `AigcComplianceConfirmationRequired` = 该模型要去即梦网页端先用一次。
+- H3 一般 20–60 秒/段出片（--wait 阻塞等待）；即梦通道一般 5–10 分钟/段。
 - 单段失败/要重拍：`--only <id>` 只重跑那段（报价再来一遍）。
 - 换场景（直播间/门店/街景）：先用 `dreamina image generate` 合成开场画面存 assets/，把它当该段参考图。
 

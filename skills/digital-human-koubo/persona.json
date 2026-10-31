@@ -7,17 +7,18 @@
  "look": "年轻东亚女生，黑色长发，白色罗纹背心外搭米色针织开衫，坐在温馨室内直播间的桌前，柔和灯光",
  "channels": {
   "default": {
-   "label": "即梦 seedance2.0mini（日常主力）",
-   "command": "image2video",
-   "model": "seedance2.0mini",
-   "resolution": "720p",
+   "label": "MiniMax-H3（apiz，默认主力——人物真实感最好）",
+   "command": "apiz generate",
+   "model": "minimax/h3",
+   "resolution": "480p",
    "min_seconds": 4,
    "max_seconds": 15,
-   "credit_per_second": 6,
-   "note": "2026-10-27 实测 36 积分/6s、0 排队约 8 分钟出片。seedance2.0fast 晚高峰队列会排几小时，不要用。"
+   "credit_per_second": 12,
+   "context_fee": 7,
+   "note": "2026-10-31 用户定版：H3 人物真实感最好，默认用这个。480p 12 apiz 积分/秒 + 每次固定 7；768P 18/秒、1080p 28/秒。参数走 content 数组（finance-explainer/scripts/h3_beats.py 有实现可抄）。生成后必跑原生音轨打轴。即梦通道为备用（积分很贵不免费）。"
   },
   "long": {
-   "label": "即梦 seedance2.5（VIP 长段/精修/局部重拍）",
+   "label": "即梦 seedance（备用通道，积分很贵且不免费）",
    "command": "image2video",
    "model": "seedance2.5",
    "resolution": "720p",
@@ -25,10 +26,10 @@
    "max_seconds": 30,
    "vip_only": true,
    "credit_per_second": null,
-   "note": "价格未实测：首次使用先拍 4 秒校准单价再报价。比例跟随参考图，不能指定 ratio。"
+   "note": "备用通道：H3 不可用时兜底。即梦积分没有任何免费额度，报价按实际扣费。"
   },
   "audio_ref": {
-   "label": "multimodal2video（指定音色/克隆声，通道 C）",
+   "label": "multimodal2video（即梦备用：指定音色/克隆声，通道 C）",
    "command": "multimodal2video",
    "model": "seedance2.0mini",
    "resolution": "720p",
@@ -36,6 +37,7 @@
    "max_seconds": 15,
    "credit_per_second": 6,
    "audio_max_seconds": 15,
+   "note_fee": "即梦积分很贵不免费；H3 也支持音频参考，优先试 H3。",
    "audio_max_segments": 3,
    "note": "音频作音色+口型参考；提示词写「用参考音频的音色说话，口型与音频同步」。seedance2.5 下 audio≤10。"
   }

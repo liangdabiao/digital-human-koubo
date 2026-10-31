@@ -1,6 +1,6 @@
 # 制作手册：数字人、素材、合成
 
-生成走 **即梦官方 dreamina CLI**（mini 实测 6 即梦积分/秒、基本 0 排队）；台词核验/备用 TTS/克隆声走 **apiz CLI**；旁白占位 **edge-tts 免费**。生成前一律先干跑报价（脚本不带 `--yes` 不花钱）→ 给用户看模型、提示词、数量、总价、余额 → 等明确同意。
+生成默认 **apiz MiniMax-H3**（480p 12 积分/秒 + context 7/次，人物真实感最好）；即梦 dreamina CLI 为备用通道（**积分很贵且不免费**）。台词核验走 apiz align（10 积分/次）；旁白占位 **edge-tts 免费**。生成前一律先报价 → 给用户看模型、提示词、数量、总价、余额 → 等明确同意。
 
 ## 1. 主播形象（定妆照）
 
@@ -9,21 +9,29 @@
 - 布景要和被参考的频道明显不同（原频道 v1 是客厅霓虹、v2 是白书架；示例集用胡桃木书架 + 绿色台灯）。
 - **身份核查**：用户给的脸如果被描述为某位真实创作者，或与前一张被描述为真人的照片五官、饰品一致只改了发型眼镜，不要用；纯文字生成或换一张确实不同的原创脸。
 
-## 2. 数字人两方案（即梦版）
+## 2. 数字人两方案
 
-| | A：multimodal2video 音频驱动（首选） | B：image2video 原生说话 |
+**默认主力：MiniMax-H3（apiz 通道）**——2026-10-31 实测对比后用户定版：人物真实感明显优于即梦 Seedance（皮肤纹理、微表情更「真人」），23 秒出片。
+**即梦通道降级为备用**：即梦积分很贵且**不免费**（没有任何每日免费积分），仅在 H3 不可用时兜底。
+
+| | A：MiniMax-H3 原生说话（默认） | B：即梦 multimodal2video 音频驱动（备用） |
 |---|---|---|
-| 输入 | 定妆照 + 该拍音频（voice/audio/<id>.wav） | 定妆照 + 提示词里写台词 |
-| 口型 | 跟着给定音频逐字同步（Seedance 原生联合生成，音素级） | 与模型自己的声音天然一致 |
-| 表情 | 亲切自然、不夸张（口型优先） | 更灵动：眨眼、挑眉、手势丰富 |
-| 价格 | mini 720p ≈6 即梦积分/秒（实测） | 同左 |
-| 时长 | 4–15 秒/拍；>14 秒自动升 seedance2.5（VIP，4–30 秒，单价未实测先拍一条校准） | ≤15 秒/拍 |
-| 声音 | **就是你的最终音频**（自录/TTS/克隆声），零换声 | 模型的声音，事后换音色（apiz，见 §3） |
-| 脚本 | `python3 scripts/dreamina_beats.py episode.json voice --mode audio --yes` | `--mode native`，出片后 `grok_beats.py` 对齐写 host.json |
+| 输入 | 定妆照（必须真 16:9 横构图，见下）+ 提示词里写台词 | 定妆照 + 该拍音频（voice/audio/<id>.wav） |
+| 口型 | 与它自己生成的声音天然一致（生成后跑 sync_beats.py 重打轴） | 跟着给定音频逐字同步 |
+| 真实感 | **强**：皮肤纹理真实（2026-10-31 用户验收定版） | 偏「AI 蜡像感」 |
+| 价格 | apiz：480p 12 积分/秒 + context 7/次；768P 18/秒；1080p 28/秒 | 即梦 mini ≈6 即梦积分/秒（贵，不免费） |
+| 时长 | 4–15 秒/拍 | 4–15 秒/拍 |
+| 声音 | H3 自己配（成片用它自带的音轨，sync_beats 打轴） | **你的最终音频**（自录/TTS/克隆声） |
+| 脚本 | `python3 scripts/h3_beats.py episode.json anchor.png gen [--resolution 480p]` | `dreamina_beats.py --mode audio`（备用） |
 
-两个模式的提示词都内置在 `dreamina_beats.py`（要点：嘴部清晰、停顿闭嘴、固定机位、与参考图一致、无字幕无水印；「俏皮挑眉」之类会盖过口型，别加）。
+**H3 硬规则（实测踩坑）**：
+- **首帧图必须本身是真 16:9 横构图**。H3 的 adaptive ratio 严格照抄首帧构图：给模糊补边的 16:9 图，成片就带模糊边条，提示词改不动。竖版照片先用 `fal-ai/nano-banana-pro`（apiz，≈60 积分）扩图成真横版：人物不变居中、两侧自然延伸书房场景，再做 anchor。
+- 参数走 content 数组：`content=[{type:text},{type:image_url,image_url:{url},role:first_frame}]`、`duration` 4–15 整数、`resolution` 480p/768P/1080p。
+- 提示词要点：固定机位中景、嘴部清晰、真实摄影质感、与参考图一致、无字幕无水印。
+- **生成后必跑 `sync_beats.py`**（原生音轨接管 + apiz align 重打轴，offset=0）。
+- 裁切输出必须 CFR 30fps（VFR 会让 Remotion 报 No frame found）。
 
-**推荐组合**：有最终音频（自录/克隆声）的拍全部走 A；要表现力的全屏特写镜头可用 B + 事后换音色；圆形小窗和被空镜盖住的拍用 B 480p（只取声音氛围）或 3 段 10 秒通用说话循环轮换，省约 40% 口型费用。
+**推荐组合**：全屏/侧移出镜拍全走 A；预算紧或 H3 不可用时小窗、被图表盖住的拍才用 B，或 3 段通用说话循环轮换。
 
 ### 接入
 - A：`dreamina_beats.py --mode audio --public <engine>/public` 出片段 → **`sync_beats.py` 收尾（必跑）**：出镜拍一律改用原生片段自带的音轨当旁白（即梦口型与它自己的音频严格对应），裁掉首尾后按 apiz align 重打字级时间轴、重建 timings（offset 恒为 0，不需要校准）。教训：另铺 TTS 音轨 + 猜 offset 必错位（片内语音起点 0.08–0.27s 不等，且 Seedance 会对参考音频重新配话速）。
@@ -41,7 +49,7 @@
 
 ## 4. 空镜、梗、贴纸
 
-- 空镜：`dreamina text2video --prompt "…slow dolly, no readable text or logos…" --duration 5 --video_resolution 720p --model_version seedance2.0mini`（≈30 积分/5 秒）。长拍用 10 秒片 + 引擎里的 Ken Burns 慢推。下载用 `dreamina query_result --submit_id=<id> --download_dir=...`。
+- 空镜静图：`apiz generate --model fal-ai/nano-banana-pro`（≈60 积分，16:9 真实质感）；动态空镜 `dreamina text2video`（即梦积分，贵，按需）。长拍用 10 秒片 + 引擎里的 Ken Burns 慢推。下载用 `dreamina query_result --submit_id=<id> --download_dir=...`。
 - 素材库：`fetch_stock.py <id> "<英文关键词>" <public>/assets --kind photo|video`（Unsplash/Pexels/Wikimedia，自动记 credits.json 片尾致谢）。不变。
 - 梗：原创 3D 卡通短片（同空镜做法），不用影视、综艺片段。
 - 卡通贴纸：`dreamina image generate --prompt "…plain solid pure green background"`（即梦积分，很便宜），然后抠绿：

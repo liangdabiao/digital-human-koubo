@@ -18,7 +18,7 @@
 
 > 这条 27 秒的直播间广告里，主播不存在。脸、声音、直播间、花字、价格动画，全是 AI 做的。
 > 输入只有一句话：「用这个数字人做一条 30 秒直播间广告，卖 WorkBuddy 上手课，10 节课 99 元，原价 999。」
-> 迁移到即梦通道后，同样一条片子只需 **约 170 即梦积分**（每日可领）；我们实测跑通的第一条完整成片——90 秒财经解说——口播部分只花了 330 积分。
+> 生成默认走 **apiz MiniMax-H3**（人物真实感实测最优）：一条 27 秒广告的口播部分约 **100 apiz 积分**；实测完整成片（90 秒财经解说、H3 出镜）口播部分约 780 积分。即梦为备用通道（积分较贵且不免费）。
 
 ---
 
@@ -50,7 +50,7 @@
 ## 能做什么
 
 - **一张照片做出固定的数字人**：脸、服装、声音描述、提示词模板都存在 `persona.json`，每条片子都是同一个人。想进什么场景（直播间、门店、教室、书房），先用即梦图片合成定妆照/开场画面，再让她开口。
-- **对口型的口播片段**：稿子切段后走**即梦官方 dreamina CLI**——`seedance2.0mini` 两种玩法：把台词写进提示词让模型原生配音（口型天然同步），或用你自录/TTS 的音频作参考做音频驱动口型（口型跟最终声音逐字同步，成片零换声）。长段/精修用 `seedance2.5`（单次最长 30 秒，VIP）。
+- **对口型的口播片段**：稿子切段后默认走 **apiz MiniMax-H3**（把台词写进提示词让模型原生配音，口型天然同步，人物真实感实测最优）。备用通道：即梦官方 dreamina CLI 的 `multimodal2video` 音频驱动口型（用你自录/TTS 的音频作参考，口型跟最终声音逐字同步）与 `image2video` 原生说话。
 - **先报价，再花钱**：所有生成脚本默认干跑——先报「段数 · 秒数 · 积分 · 余额」，你点头加 `--yes` 才提交；先拍第 1 段给你看，满意再批量。
 - **两道质检**：每段用 `apiz align` 把生成语音和文稿逐字比对（实测零错字，同时产出字级打轴数据），再抽帧检查（Seedance 偶尔也会自己烧字幕，有就重拍那段）。本地 whisper 仍可用（零积分可选）。
 - **声音统一**：固定角色参考图（Seedance 会从脸推声音）+ 固定音色描述 + 1/3 倍频程频谱匹配与去齿音（`voicefx/unify.py`，实测齿音段间差 13.2 dB → 5.9 dB），30 段分开生成的口播听起来像一次录完。
@@ -85,7 +85,7 @@
 1. **能装 Agent Skills**（技能目录或上传技能包）；
 2. **能在你电脑上执行命令**（即梦 dreamina CLI、apiz CLI、ffmpeg、Python、Node——用来生成、质检、剪辑）。
 
-生成走你自己的即梦账号（OAuth 浏览器登录，不复制任何 key），**不再需要接远程 MCP 服务器**。
+生成走你自己的 apiz / 即梦账号（key 或 OAuth 浏览器登录），**不再需要接远程 MCP 服务器**。
 
 | Agent | 装 Skill | 本机执行命令 | 状态 |
 |---|---|---|---|
@@ -126,23 +126,20 @@ mkdir -p ~/.codex/skills && cp -R skills/digital-human-koubo skills/finance-expl
 cd skills && zip -r ../digital-human-skills.zip digital-human-koubo finance-explainer && cd ..
 ```
 
-### 3 · 安装即梦官方 dreamina CLI（AI 视频 / 图片生成）
+### 3 · 安装 apiz CLI（AI 视频 / 图片生成主力）与即梦 CLI（备用）
 
-生成走你自己的即梦账号和积分（积分每日可领）。一条命令安装，浏览器 OAuth 授权，不复制任何 key：
-
-```bash
-curl -s https://jimeng.jianying.com/cli | bash   # 安装 dreamina CLI（Windows 用 Git Bash 同款命令）
-dreamina login                                   # 浏览器打开链接、输授权码即可
-dreamina user_credit                             # 查余额，能查到就通了
-```
-
-> 日常用 `seedance2.0mini`（实测 720p ≈6 即梦积分/秒，基本 0 排队）；**不要用 `seedance2.0fast`**——晚高峰免费队列会排几小时。`seedance2.5` 最长 30 秒、VIP 专属。
-
-### 4 · 安装 apiz CLI（台词核验 / TTS / 克隆声）
+生成默认走 **apiz MiniMax-H3**；即梦为备用通道（**积分很贵且不免费**）。
 
 ```bash
 curl -fsSL https://data.apiz.ai/cli/install.sh | bash   # 或见 apiz.ai 官网
 apiz auth login                                          # 存 API key
+```
+
+即梦 CLI（备用通道，H3 不可用时再装）：
+```bash
+curl -s https://jimeng.jianying.com/cli | bash   # 安装 dreamina CLI（Windows 用 Git Bash 同款命令）
+dreamina login                                   # 浏览器打开链接、输授权码即可
+dreamina user_credit                             # 查余额，能查到就通了
 ```
 
 ### 5 · 本机工具（生成、质检、剪辑要用）
@@ -275,11 +272,10 @@ python3 scripts/cutout_video.py public/main.mp4 public/main_cut_s4.webm --from 1
 
 | 视频 | 生成内容 | 即梦积分 |
 |---|---|---|
-| **财经解说 16:9 90 秒（本仓库实测）** | 定妆照 + 3 空镜图 + 6 拍出镜口播（720p） | **约 350** |
-| 直播间广告 9:16 27 秒（换算） | 1 张场景图 + 5 段口播（720p） | **约 170** |
-| 4 分钟教程 16:9（换算） | 约 30 段口播 + 场景图 | **约 1,100** |
+| **财经解说 16:9 约 96 秒（本仓库实测，H3 出镜）** | nano-banana 扩图 + 6 拍 H3 出镜（480p，54.8s） | **约 840 apiz 积分** |
+| 直播间广告 9:16 27 秒（换算，H3 480p） | 1 张场景图 + 5 段口播 | **约 420 apiz 积分** |
 
-价格基准（2026-10 实测）：`seedance2.0mini` 720p ≈ **6 即梦积分/秒**（积分每日可领，近似零现金成本）；`seedance2.5`（30 秒长段/精修，VIP）单价用前先拍 4 秒校准。图片生成几个积分一张。以 Agent 实时报价为准；apiz 侧台词核验约 10 积分/段（0.1 元）。
+价格基准（2026-10 实测）：**H3** 480p **12 apiz 积分/秒** + 每次固定 7（768P 18/秒、1080p 28/秒）；扩图 nano-banana-pro ≈60 积分/张；台词核验 apiz align ≈10 积分/段。即梦备用通道按实际扣费（**不免费**）。以 Agent 实时报价为准。
 
 ## 目录结构
 
