@@ -45,7 +45,7 @@
 - **主播自录（首选）**：`align_recording.py 录音 episode.json voice/` — 按停顿切段 whisper 对齐、重录取最后一遍、压长停顿。本地免费，与生成通道无关。
 - **占位（免费）**：`narrate_edge.py narration.json voice --gap 0.22 --lead 0.3` —— edge-tts（小晓/云希等），词级时间戳来自合成事件本身，**不需要 whisper**，输出 timings.json 与 MiMo 版同契约。英文缩写写进 lexicon 拆字母读（GPU→G P U），型号写中文读法。
 - **占位（MiMo，可选）**：narrate_mimo.py 仍在，有 MIMO_API_KEY 或要克隆声时用。
-- **克隆声**：apiz `voice-clone`（10 秒–5 分钟干净样本，只克隆本人或授权者）→ 克隆音色合成逐拍音频 → 走 A 方案，口型自动跟克隆声。
+- **克隆声（海螺）**：`python3 ../digital-human-koubo/scripts/voice_clone.py 样本.mp3 --name 我的音色`（apiz minimax/voice-clone；样本 10 秒–5 分钟，只克隆本人或授权者）→ voice id 填 narrate_edge/narrate_mimo 合成逐拍音频 → 走 A 方案，口型自动跟克隆声。
 - **不做**：从真实创作者的视频里截取声音做克隆参考。
 
 ## 4. 空镜、梗、贴纸

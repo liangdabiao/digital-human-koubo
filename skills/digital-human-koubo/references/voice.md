@@ -10,7 +10,7 @@
 |---|---|
 | 纯旁白 / 画外音 / 不出镜段 | `tts.py` 用 edge-tts 合成（免费），剪辑时单独铺轨 |
 | 用户要指定音色（如小米腔、新闻腔） | `tts.py` 选 persona → voice.tts.map 里的音色 → 该段标 `"channel": "audio_ref"`，multimodal2video 拿音频作音色+口型参考 |
-| 用户要自己的声音 | 先克隆：apiz `voice-clone`（10 秒–5 分钟干净样本，只克隆本人或授权者），克隆出的 voice id 填进 tts.py；再走 audio_ref 通道 |
+| 用户要自己的声音 | **海螺声音克隆**：`python3 scripts/voice_clone.py 样本.mp3 --name 我的音色`（apiz minimax/voice-clone；样本 mp3/m4a/wav、10 秒–5 分钟、≤20MB），脚本自动上传→克隆→试听 clone_test.mp3，voice id 填进 persona.json → voice.tts.cloned_voice_id；再走 audio_ref 通道 |
 
 ## edge-tts 音色速查（`python -m edge_tts --list-voices` 看全部）
 
@@ -28,3 +28,13 @@
 - 原生配音多段有漂移 → `python3 scripts/voicefx/unify.py <输出目录> <片段…>`（复用旧段加 `--ref 旧目录`；场景/动物段加 `--scene`）
 - TTS 旁白与原生配音混排时，各自 unify 后再统一响度
 - 台词核验和字级时间轴：assemble.py 默认 `--qc align`（apiz align，10 积分/段，实测零错字）；零积分用 `--qc whisper`
+
+
+## 海螺声音克隆（apiz，默认克隆通道）
+
+- 触发：用户说「克隆我的声音 / 用我的声音配」时走这一步（用户需要时才加，平时跳过）。
+- 命令：`python3 scripts/voice_clone.py <样本音频> --name <自定义voice_id>`
+- 样本：mp3/m4a/wav，10 秒–5 分钟，≤20MB；安静房间、离麦 20 厘米、无混响。只克隆本人或明确授权者的声音。
+- 流程：上传 → 克隆 → `apiz voices list` 的 user_voices 里确认 → 自动合成试听 clone_test.mp3 → 用户人耳确认。
+- 克隆音色用法：`apiz speak --voice <voice_id>`（纯旁白）或填 persona.json → voice.tts.cloned_voice_id → tts.py 合成 → multimodal2video 音频驱动（口型跟克隆声）。
+- 时效：克隆音色有过期风险（voices list 的 status 字段 active/expired），过期重跑脚本再克隆一次即可。

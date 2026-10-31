@@ -57,7 +57,9 @@
     "ja": "ja-JP-NanamiNeural",
     "ko": "ko-KR-SunHiNeural"
    },
-   "note": "只在三种场景用：纯旁白/画外音段、用户指定音色、克隆声（apiz voice-clone）。出镜口播默认走 seedance-native。"
+   "note": "只在三种场景用：纯旁白/画外音段、用户指定音色、克隆声（apiz voice-clone）。出镜口播默认走 seedance-native。",
+   "cloned_voice_id": null,
+   "clone_note": "海螺克隆：python3 scripts/voice_clone.py 样本.mp3 --name 我的音色；voice_id 填这里，tts.py --voice 引用"
   }
  },
  "prompt_template": "竖屏直播画面，{look}。画面中的她面对镜头，像{purpose}一样看镜头说话，嘴部始终清晰可见，{act}。她用{language}清晰地说：\"{line}\" {voice_desc}。画面无字幕无文字。",
