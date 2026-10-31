@@ -57,7 +57,8 @@ Click a GIF (or "Watch") to play the full video. Every demo below was produced w
 - **5 editing styles, chosen for your content** — the agent diagnoses your content, recommends 2 styles with preview images and asks you everything in one go (style · ratio & length · caption intensity · presenter).
 - **48 packaging components** — measured frame-by-frame from 25 videos by top creators (MrBeast, Mark Rober, Ryan Trahan, MKBHD, MediaStorm/影视飓风, 何同学, Johnny Harris, Vox, Kurzgesagt, 回形针, 半佛仙人, 差评, 毕导). Each style has a default packaging recipe; add or remove techniques by just asking.
 - **Text behind the presenter** — big words / numbers between the background and the person (macOS Vision person segmentation → transparent video → 3-layer composite).
-- **Multi-language** — English, Japanese, Korean, French, Spanish, Arabic tested; narration and custom voices use edge-tts (free), cloned voices via apiz.
+- **Multi-language** — English, Japanese, Korean, French, Spanish, Arabic tested; narration and custom voices use edge-tts (free).
+- **Conch voice cloning (on demand)** — when the user asks to *clone a voice*, one command uploads the sample, clones and auto-generates a listenable test: `python3 scripts/voice_clone.py sample.mp3 --name my-voice` (apiz minimax/voice-clone; mp3/m4a/wav, 10 s–5 min, ≤20 MB). The cloned voice drives narration directly, or via `tts.py` as an audio reference — on-camera lip-sync follows the cloned voice. Only clone voices you own or are licensed to use.
 - **Works with your agent** — a standard `SKILL.md` Agent Skill plus scripts. **No MCP server required** — any agent that can load skills and run local commands (Dreamina CLI / ffmpeg / Python / Node) can drive it.
 
 ## How it works
@@ -290,7 +291,7 @@ skills/
     persona.json                  presenters, reference images, channel configs, prompt templates
     references/                   style menu · packaging · playbook · install · research reports
     scripts/                      build_plan · generate_segments · tts · assemble · align
-                                  rangedl · check_edit · cutout_video · voicefx/unify
+                                  rangedl · check_edit · cutout_video · voicefx/unify · voice_clone
                                   doctor · new_edit · make_assets
     templates/
       huazi-916/                  9:16 data-driven talking-head template (edit.json)

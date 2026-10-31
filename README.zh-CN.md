@@ -57,7 +57,8 @@
 - **按内容推荐剪辑风格**：Agent 先诊断内容，推荐 2 种风格并附预览图，一次问完（风格 · 比例时长 · 花字强度 · 主播）。
 - **48 个包装组件**：逐帧拆了 25 支头部博主视频（MrBeast、Mark Rober、Ryan Trahan、MKBHD、影视飓风、何同学、Johnny Harris、Vox、Kurzgesagt、回形针、半佛仙人、差评、毕导）。每种风格自带默认包装，想加减直接说。
 - **景深字**：大字 / 数字放在背景和人之间（macOS Vision 人像分割 → 透明视频 → 三层合成）。
-- **多语言**：英、日、韩、法、西、阿拉伯语实测；旁白与指定音色走 edge-tts（免费），克隆声走 apiz。
+- **多语言**：英、日、韩、法、西、阿拉伯语实测；旁白与指定音色走 edge-tts（免费）。
+- **海螺声音克隆（按需环节）**：用户说「用我的声音 / 克隆声音」时，一条命令上传样本→克隆→自动试听：`python3 scripts/voice_clone.py 样本.mp3 --name 我的音色`（apiz minimax/voice-clone；样本 mp3/m4a/wav、10 秒–5 分钟、≤20MB）。克隆出的音色直接做纯旁白，或经 `tts.py` 合成后作音频参考——出镜口型自动跟克隆声走。只克隆本人或明确授权者的声音。
 - **多种 Agent 都能用**：标准 `SKILL.md` Agent Skill + 脚本。**不再需要接任何 MCP 服务器**——只要能装 Skill、能在本机跑命令（即梦 CLI / ffmpeg / Python / Node），就能驱动整条流程。
 
 ## 工作流程
@@ -286,7 +287,7 @@ skills/
     persona.json                  主播形象、参考图、三通道配置、提示词模板
     references/                   风格菜单 · 包装组件 · 手法库 · 安装 · 拆解报告
     scripts/                      build_plan · generate_segments · tts · assemble · align
-                                  rangedl · check_edit · cutout_video · voicefx/unify
+                                  rangedl · check_edit · cutout_video · voicefx/unify · voice_clone
                                   doctor · new_edit · make_assets
     templates/
       huazi-916/                  9:16 数据驱动花字口播模板（edit.json）
