@@ -18,7 +18,7 @@ Script, lip-synced AI presenter, voice clean-up, captions, and pro-YouTuber-styl
 
 > This 27-second livestream ad has no real presenter. Face, voice, studio, captions and the price animation are all AI.
 > The only input was one sentence: *"Use this digital human to make a 30-second livestream ad for the WorkBuddy course — 10 lessons, ¥99, was ¥999."*
-> Generation defaults to **MiniMax-H3 via apiz** (best measured realism): the talking-head part of a 27-second ad costs about **100 apiz credits**; our measured 90-second finance explainer spent ≈780 credits on 6 H3 presenter beats. Dreamina (Jimeng) remains as a fallback channel — its credits are pricey and **not free**.
+> Generation defaults to **MiniMax-H3 via apiz** (best measured realism, user-accepted): our measured finance explainer — 96 s of narration, 6 H3 presenter beats — spent **779 apiz credits** on the talking-head parts, table-to-final-video in about 20 minutes. Dreamina (Jimeng) remains as a fallback channel — its credits are pricey and **not free**.
 
 ---
 
@@ -275,8 +275,8 @@ It works on **medium shots with headroom**. In a selfie close-up the person fill
 
 | Video | Generation | Jimeng credits |
 |---|---|---|
-| **Finance explainer, 16:9, ~96 s (real run in this repo, H3 presenter)** | nano-banana outpaint + 6 H3 beats (480p, 54.8 s) | **≈840 apiz credits** |
-| Livestream ad, 9:16, 27 s (converted, H3 480p) | 1 scene image + 5 talking segments | **≈420 apiz credits** |
+| **Finance explainer, 16:9, 104 s (real run in this repo, H3 presenter, user-accepted)** | nano-banana-pro outpaint 60 + 6 H3 beats (480p, 54.8 s) 779 + align retiming 60 | **≈900 apiz credits** |
+| Livestream ad, 9:16, 27 s (converted, H3 480p) | 1 outpainted image + 5 talking segments (~27 s) | **≈390 apiz credits** |
 | 4-minute tutorial, 16:9 (converted) | ~30 talking segments + scene images | **≈1,100** |
 
 Price basis (measured 2026-10): **MiniMax-H3** 480p **12 apiz credits/s** + a flat 7 per call (768P 18/s, 1080p 28/s); nano-banana-pro outpainting ≈60 credits/image; script verification ≈10 credits/segment. The Dreamina fallback channel bills per use (**not free**). Always confirm with the agent's live quote.
