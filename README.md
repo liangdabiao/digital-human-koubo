@@ -5,7 +5,20 @@
 **一张照片 + 一句话 → 一条带数字人出镜的口播成片。**
 写稿、对口型的 AI 主播、修音、字幕、头部博主级包装，全部交给你的 AI Agent 自动完成。
 
-看演示视频： https://www.bilibili.com/video/BV1vaxg6HETf/?vd_source=86926e418c83af75f6850b5546388a79
+### 看演示视频： 
+
+真人口播效果：
+
+https://www.bilibili.com/video/BV12mxk6hEjo/?vd_source=86926e418c83af75f6850b5546388a79
+
+直播带货效果：
+
+https://www.bilibili.com/video/BV1yDxk6bEXA/?vd_source=86926e418c83af75f6850b5546388a79
+
+
+数字人效果：
+
+https://www.bilibili.com/video/BV1vaxg6HETf/?vd_source=86926e418c83af75f6850b5546388a79
 
 
 **简体中文** · [English](README.en.md)
